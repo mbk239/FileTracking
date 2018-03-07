@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.6
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileTracking.Services", "FileTracking.Services\FileTracking.Services.csproj", "{660BCE69-12AB-4F44-B5F9-FF40EB22C598}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileTracking.Services.BO", "FileTracking.Services.BO\FileTracking.Services.BO.csproj", "{F935B6AC-A4F8-49D0-B6B7-B0CA00434981}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileTracking.Client.Common", "..\Client\FileTracking.Client.Common\FileTracking.Client.Common.csproj", "{A65E79B5-FE35-417F-9C99-C18887D6298A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{660BCE69-12AB-4F44-B5F9-FF40EB22C598}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{660BCE69-12AB-4F44-B5F9-FF40EB22C598}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{660BCE69-12AB-4F44-B5F9-FF40EB22C598}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{660BCE69-12AB-4F44-B5F9-FF40EB22C598}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F935B6AC-A4F8-49D0-B6B7-B0CA00434981}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F935B6AC-A4F8-49D0-B6B7-B0CA00434981}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F935B6AC-A4F8-49D0-B6B7-B0CA00434981}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F935B6AC-A4F8-49D0-B6B7-B0CA00434981}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A65E79B5-FE35-417F-9C99-C18887D6298A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A65E79B5-FE35-417F-9C99-C18887D6298A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A65E79B5-FE35-417F-9C99-C18887D6298A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A65E79B5-FE35-417F-9C99-C18887D6298A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

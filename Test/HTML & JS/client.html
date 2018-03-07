@@ -1,0 +1,266 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+        table { border: 0 }
+        .commslog-data { font-family: Consolas, Courier New, Courier, monospace; }
+        .commslog-server { background-color: red; color: white }
+        .commslog-client { background-color: green; color: white }
+    </style>
+</head>
+<body>
+    <h1>WebSocket Sample Application</h1>
+    <p id="stateLabel">Ready to connect...</p>
+    <div>
+        <label for="username">UserName:</label>
+        <input id="username" value="loguser" />
+        <label for="password">Password:</label>
+        <input id="password" value="Password" />
+        </div>
+    <p></p>
+        <div>
+            <label for="connectionUrl">WebSocket Server URL:</label>
+			<select id="connectionUrl" style="width:150px;">
+			  <option value="ws://file.pingg.vn:83/filetracking" selected="selected">file.pingg.vn</option>
+			  <option value="ws://localhost:83/filetracking">Localhost</option>			  
+			</select>
+            <button id="connectButton" type="submit">Connect</button>
+        </div>
+        <p></p>
+        <div>
+            <label for="sendMessage">Message to send:</label>
+            <input id="sendMessage" disabled value="hello every body"/>
+		</div>
+        <p></p>
+        <div>
+            <button id="sendButton" type="submit" disabled>Send</button>
+            <button id="sendFileAction" disabled>Send File Action</button>
+			<button id="sendMessageToListUser" disabled>Send Mesage to list user</button>
+            <button id="closeButton" disabled>Close Socket</button>
+        </div>
+        <h2>Communication Log</h2>
+		<table style="width: 800px">
+		<thead>
+                <tr style="vertical-align:top;">
+						<td style="width:50%">
+			<button id="clearTextArea" onclick="clearLog();">Clear TextArea</button><p></p>
+			<label for="textLog">All Server Message:</label>
+			<textarea rows="30" cols="100" id="textLog"></textarea>
+		</td>
+				<td>
+        <table style="width: 800px">
+            <thead>
+                <tr>
+                    <td style="width: 100px">From</td>
+                    <td style="width: 100px">Mesage Type</td>
+                    <td style="width: 300px">Data</td>
+                </tr>
+            </thead>
+            <tbody id="commsLog"></tbody>
+        </table>
+		</td>
+        </tr>
+            </thead>
+            <tbody></tbody>
+        </table>		
+        <script>
+            var messageToSend = {
+                'MessageType': "",
+                'Value': ""
+            };
+
+            var connectionForm = document.getElementById("connectionForm");
+            var connectionUrl = document.getElementById("connectionUrl");
+            var username = document.getElementById("username");
+            var password = document.getElementById("password");
+            var connectButton = document.getElementById("connectButton");
+            var stateLabel = document.getElementById("stateLabel");
+            var sendMessage = document.getElementById("sendMessage");
+            var sendButton = document.getElementById("sendButton");
+			var sendMessageToListUser = document.getElementById("sendMessageToListUser");
+            var sendForm = document.getElementById("sendForm");
+            var commsLog = document.getElementById("commsLog");
+            var sendFileAction = document.getElementById("sendFileAction");
+			var textLog = document.getElementById("textLog");
+            var socket;
+			
+			function clearLog(){
+				textLog.value = '';
+				commsLog.innerHTML = "";
+			}
+			
+            function updateState() {
+                function disable() {
+                    sendMessage.disabled = true;
+                    sendButton.disabled = true;
+                    closeButton.disabled = true;
+                    sendFileAction.disabled = true;
+					sendMessageToListUser.disable = true;
+                }
+                function enable() {
+                    sendMessage.disabled = false;
+                    sendButton.disabled = false;
+                    closeButton.disabled = false;
+                    sendFileAction.disabled = false;
+					sendMessageToListUser.disabled = false;
+                }
+
+                connectionUrl.disabled = true;
+                connectButton.disabled = true;
+                username.disabled = true;
+
+                if (!socket) {
+                    disable();
+                } else {
+                    switch (socket.readyState) {
+                        case WebSocket.CLOSED:
+                            stateLabel.innerHTML = "Closed";
+                            disable();
+                            connectionUrl.disabled = false;
+                            connectButton.disabled = false;
+							username.disabled = false;
+                            break;
+                        case WebSocket.CLOSING:
+                            stateLabel.innerHTML = "Closing...";
+                            disable();
+                            break;
+                        case WebSocket.CONNECTING:
+                            stateLabel.innerHTML = "Connecting...";
+                            disable();
+                            break;
+                        case WebSocket.OPEN:
+                            stateLabel.innerHTML = "Open";
+                            enable();
+                            break;
+                        default:
+                            stateLabel.innerHTML = "Unknown WebSocket State: " + socket.readyState;
+                            disable();
+                            break;
+                    }
+                }
+            }
+
+            closeButton.onclick = function () {
+                if (!socket || socket.readyState != WebSocket.OPEN) {
+                    alert("socket not connected");
+                }
+                socket.close(1000, "Closing from client");
+            }
+
+            sendFileAction.onclick = function () {
+                if (!socket || socket.readyState != WebSocket.OPEN) {
+                    alert("socket not connected");
+                }
+                var fileactioninfo = {
+                    'UserName': username.value,
+                    'FilePath': username.value,
+                    'FileName': password.value,
+                    'Action': 4
+                };
+                messageToSend.MessageType = "fileaction";
+                messageToSend.Value = JSON.stringify(fileactioninfo);
+
+                socket.send(JSON.stringify(messageToSend));
+
+                commsLog.innerHTML += '<tr>' +
+                    '<td class="commslog-client">Me</td>' +
+                    '<td class="commslog-server">Send File Action</td>' +
+                    '<td class="commslog-data">' + data + '</td>'
+                '</tr>';
+            }
+
+            sendButton.onclick = function () {
+                if (!socket || socket.readyState != WebSocket.OPEN) {
+                    alert("socket not connected");
+                }
+                messageToSend.MessageType = "message";
+                messageToSend.Value = sendMessage.value;                
+                socket.send(JSON.stringify(messageToSend));
+                commsLog.innerHTML += '<tr>' +
+                    '<td class="commslog-client">Me</td>' +
+                    '<td class="commslog-server">send message</td>' +
+                    '<td class="commslog-data">' + data + '</td>'
+                '</tr>';
+            }
+
+			sendMessageToListUser.onclick = function () {
+                if (!socket || socket.readyState != WebSocket.OPEN) {
+                    alert("socket not connected");
+                }
+				        var objMessage = //{Username: "", FullName: "", Message: "TaoThuMucMoi,1657,1368,ddddd", ToList: []};
+						{
+                            'Username': '',
+                            'FullName': '',
+							'Message': sendMessage.value,
+							'ToList': []
+							//'ToList': ['User01', 'User03', 'ClientApp']
+                        };
+                messageToSend.MessageType = "apicommand";
+                messageToSend.Value = JSON.stringify(objMessage)
+				              
+                socket.send(JSON.stringify(messageToSend));
+                commsLog.innerHTML += '<tr>' +
+                    '<td class="commslog-client">Me</td>' +
+                    '<td class="commslog-server">send message</td>' +
+                    '<td class="commslog-data">' + sendMessage.value + '</td>'
+                '</tr>';
+            }
+            connectButton.onclick = function () {
+                stateLabel.innerHTML = "Connecting";
+                socket = new WebSocket(connectionUrl.options[connectionUrl.selectedIndex].value);
+                socket.onopen = function (event) {
+                    updateState();
+                    commsLog.innerHTML += '<tr>' +
+                        '<td colspan="3" class="commslog-data">Connection opened</td>' +
+                        '</tr>';
+                    if (socket && socket.readyState == WebSocket.OPEN) {
+                        var userinfor = {
+                            'Username': username.value,
+                            'Password': password.value
+                        };
+                        messageToSend.MessageType = "login";
+                        messageToSend.Value = JSON.stringify(userinfor);
+                        //var data = '{"MessageType":"login", "Value":"' + '{"Username":"' + username.value + '","Password":"' + password.value + '"}' + '"}';
+                        console.log(JSON.stringify(messageToSend));
+                        socket.send(JSON.stringify(messageToSend));
+                    }
+                };
+                socket.onclose = function (event) {
+                    updateState();
+                    commsLog.innerHTML += '<tr>' +
+                        '<td colspan="3" class="commslog-data">Connection closed. Code: ' + event.code + '. Reason: ' + event.reason + '</td>' +
+                        '</tr>';
+                };
+                socket.onerror = updateState;
+                socket.onmessage = function (event) {
+                    var revmessage = JSON.parse(event.data);
+                    if (revmessage.MessageType == "fileaction") {
+                        var actioninfor = JSON.parse(revmessage.Value);
+                        commsLog.innerHTML += '<tr>' +
+                            '<td class="commslog-server">' + actioninfor.UserName + '</td>' +
+                            '<td class="commslog-client">' + revmessage.MessageType + '</td>' +
+                            '<td class="commslog-data">File Action: ' + actioninfor.Action + '</br>File path: ' + actioninfor.FilePath + '</br>File name: ' + actioninfor.FileName + '</td>'
+                        '</tr>';
+                    }
+                    else if (revmessage.MessageType == "message") {
+                        var messageinfor = JSON.parse(revmessage.Value);
+						if( messageinfor.UserName != 'Server log')
+						{
+							commsLog.innerHTML += '<tr>' +
+								'<td class="commslog-server">' + messageinfor.UserName + '</td>' +
+								'<td class="commslog-client">' + revmessage.MessageType + '</td>' +
+								'<td class="commslog-data">' + messageinfor.Message + '</td>'
+							'</tr>';
+						}
+						else
+						{
+							textLog.value = messageinfor.Message + "\r\n\r\n\r\n" + textLog.value
+						}
+                    }
+                };
+            };
+        </script>
+</body>
+</html>
